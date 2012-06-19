@@ -49,7 +49,7 @@
        <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.ow2.jonas.jpaas</groupId>
+      <groupId>org.ow2.jonas.jpaas.jpaas-manager-api</groupId>
       <artifactId>jpaas-manager-api</artifactId>
       <version>1.0.0-SNAPSHOT</version>
     </dependency>

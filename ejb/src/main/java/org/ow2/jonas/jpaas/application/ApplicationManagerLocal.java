@@ -24,15 +24,16 @@
  */
 package org.ow2.jonas.jpaas.application;
 
-import org.ow2.jonas.jpaas.api.Application;
-import org.ow2.jonas.jpaas.api.ApplicationVersion;
-import org.ow2.jonas.jpaas.api.ApplicationVersionInstance;
-import org.ow2.jonas.jpaas.api.Environment;
+import org.ow2.jonas.jpaas.manager.api.Application;
+import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
+import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
+import org.ow2.jonas.jpaas.manager.api.Environment;
 
 import java.util.List;
 import java.util.concurrent.Future;
 
 public interface ApplicationManagerLocal {
+
   public Application createApplication(String cloudApplicationDescritor);
   public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor);
   public void notifyArtefactUploades(String appId, String versionId, String artefactId);

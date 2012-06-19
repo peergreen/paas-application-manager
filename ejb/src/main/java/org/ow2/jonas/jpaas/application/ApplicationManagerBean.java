@@ -24,18 +24,18 @@
  */
 package org.ow2.jonas.jpaas.application;
 
-import org.ow2.jonas.jpaas.api.Application;
-import org.ow2.jonas.jpaas.api.ApplicationVersion;
-import org.ow2.jonas.jpaas.api.ApplicationVersionInstance;
-import org.ow2.jonas.jpaas.api.Environment;
+import org.ow2.jonas.jpaas.manager.api.Application;
+import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
+import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
+import org.ow2.jonas.jpaas.manager.api.Environment;
 
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import java.util.List;
 import java.util.concurrent.Future;
 
-@Stateful
+@Stateless(mappedName="ApplicationManagerBean")
 @Local(ApplicationManagerLocal.class)
 @Remote(ApplicationManagerRemote.class)
 public class ApplicationManagerBean {
@@ -45,14 +45,32 @@ public class ApplicationManagerBean {
 
   public Application createApplication(String cloudApplicationDescritor) {
     //TODO
-    System.out.println("JPAAS-APPLICATION-MANAGER / createApplication called");
-    return null;
+    System.out.println("JPAAS-APPLICATION-MANAGER / createApplication called : " +  cloudApplicationDescritor);
+    Application app = new Application();
+    app.setDescription("JPAAS-APPLICATION-MANAGER during createApplication");
+    try {
+      Thread . currentThread (). sleep (( int) Math . random ()*2000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+    finally {
+       System.out.println("JPAAS-APPLICATION-MANAGER / createApplication finished : ");
+       return app;
+    }
   }
 
   public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor) {
     //TODO
-    System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersion called");
-    return null;
+    System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersion called : " + cloudApplicationVersionDescriptor);
+ try {
+      Thread . currentThread (). sleep (( int) Math . random ()*2000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+    finally {
+       System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersion finished : ");
+       return null;
+    }
   }
 
   public void notifyArtefactUploades(String appId, String versionId, String artefactId) {
@@ -62,8 +80,16 @@ public class ApplicationManagerBean {
 
   public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) {
     //TODO
-    System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called");
-    return null;
+    System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called : " + cloudApplicationVersionInstanceDescriptor + deploymentDescriptor);
+     try {
+      Thread . currentThread (). sleep (( int) Math . random ()*2000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
+    finally {
+       System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance finished : ");
+       return null;
+    }
   }
 
   public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) {
