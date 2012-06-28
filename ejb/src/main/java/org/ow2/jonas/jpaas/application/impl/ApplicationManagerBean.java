@@ -22,8 +22,9 @@
  * $Id$
  * --------------------------------------------------------------------------
  */
-package org.ow2.jonas.jpaas.application;
+package org.ow2.jonas.jpaas.application.impl;
 
+import org.ow2.jonas.jpaas.application.api.ApplicationManager;
 import org.ow2.jonas.jpaas.manager.api.Application;
 import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
 import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
@@ -35,10 +36,10 @@ import javax.ejb.Stateless;
 import java.util.List;
 import java.util.concurrent.Future;
 
-@Stateless(mappedName="ApplicationManagerBean")
-@Local(ApplicationManagerLocal.class)
-@Remote(ApplicationManagerRemote.class)
-public class ApplicationManagerBean {
+@Stateless(mappedName="jpaas/application-manager")
+@Local(ApplicationManager.class)
+@Remote(ApplicationManager.class)
+public class ApplicationManagerBean implements ApplicationManager {
 
   public ApplicationManagerBean() {
   }

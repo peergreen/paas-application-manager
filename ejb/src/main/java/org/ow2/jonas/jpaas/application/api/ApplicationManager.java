@@ -22,7 +22,7 @@
  * $Id$
  * --------------------------------------------------------------------------
  */
-package org.ow2.jonas.jpaas.application;
+package org.ow2.jonas.jpaas.application.api;
 
 import org.ow2.jonas.jpaas.manager.api.Application;
 import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
@@ -32,7 +32,7 @@ import org.ow2.jonas.jpaas.manager.api.Environment;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public interface ApplicationManagerLocal {
+public interface ApplicationManager {
 
   public Application createApplication(String cloudApplicationDescritor);
   public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor);
