@@ -37,6 +37,7 @@
   <groupId>org.ow2.jonas.jpaas.jpaas-application-manager</groupId>
   <artifactId>application-manager-ejb</artifactId>
   <name>jPaaS :: Application Manager :: Bundle EJB jar</name>
+  <version>1.0.0-SNAPSHOT</version>
   <packaging>bundle</packaging>
 
   <description>jPaaS :: Application Manager :: Bundle EJB jar</description>
