@@ -33,6 +33,8 @@ import org.ow2.jonas.jpaas.manager.api.Environment;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -106,8 +108,85 @@ public class ApplicationManagerBean implements ApplicationManager {
 
   public List<Application> findApplications() {
     //TODO
-    System.out.println("JPAAS-APPLICATION-MANAGER / findApplications called");
-    return null;
+	System.out.println("JPAAS-APPLICATION-MANAGER / findApplications called");
+	
+	//Test code that returns a list of Applications instead null
+	ArrayList<Application> listApplication = new ArrayList<Application>();
+	
+	//Application 1
+	Application app1=new Application();
+	app1.setAppId("23645");
+	app1.setName("My first application");
+	
+		//Version 1 of Application 1
+		ApplicationVersion version1 = new ApplicationVersion();
+		version1.setVersionId("23462");
+		version1.setVersionLabel("Version 1 of Application  1");
+		version1.setAppId("23645");
+	
+	        //Instance 1 of Version 1
+			ApplicationVersionInstance instance1=new ApplicationVersionInstance();
+			instance1.setInstanceId("196");
+			instance1.setAppId("23645");
+			instance1.setVersionId("23462");
+			instance1.setInstanceName("1rst instance of the 1rst version of the 1rst application");
+			instance1.setState(ApplicationVersionInstance.INSTANCE_STARTED);
+		
+		version1.getListApplicationVersionInstance().add(instance1);
+	  
+		//Version 2 of Application 1
+		ApplicationVersion version2 = new ApplicationVersion();
+		version2.setVersionId("635478");
+		version2.setVersionLabel("Version 2 of Application  1");
+			
+			//Instance 1 of Version 2
+			ApplicationVersionInstance instance2=new ApplicationVersionInstance();
+			instance2.setInstanceId("638");
+			instance2.setAppId("23645");
+			instance2.setVersionId("635478");
+			instance2.setInstanceName("2nd instance of the 2 nd version of the 1srt app");
+			instance2.setState(ApplicationVersionInstance.INSTANCE_RUNNING);
+		
+		version2.getListApplicationVersionInstance().add(instance2);
+	    
+		app1.getListApplicationVersion().add(version1);
+		app1.getListApplicationVersion().add(version2);
+		
+		//-----------------------------------------------------------------------------------
+		
+		//Application 2
+		Application app2=new Application();
+		app2.setAppId("23645");
+		app2.setName("My second application");
+		
+			//Version 1 of Application 2
+			ApplicationVersion version3 = new ApplicationVersion();
+			version3.setVersionId("853214");
+			version3.setAppId("23645");
+			version3.setVersionLabel("Version 1 of Application  2");
+		
+		      //Instance 1 of Version 2
+			  ApplicationVersionInstance instance3=new ApplicationVersionInstance();
+			  instance3.setInstanceId("789");
+			  instance3.setVersionId("853214");
+			  instance3.setAppId("23645");
+			  instance3.setInstanceName("1rst instance of the 1rst version of 2nd application");
+			  instance3.setState(ApplicationVersionInstance.INSTANCE_STOPPED);
+			
+			version3.getListApplicationVersionInstance().add(instance3);
+		  
+			  
+			app2.getListApplicationVersion().add(version3);
+
+			
+			
+			listApplication.add(app1);
+			listApplication.add(app2);
+
+			
+
+   
+    return listApplication;
   }
 
   public List<ApplicationVersion> findApplicationVersion(String appId) {
