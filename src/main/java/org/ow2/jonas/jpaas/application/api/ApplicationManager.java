@@ -29,6 +29,7 @@ import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
 import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
 import org.ow2.jonas.jpaas.manager.api.Environment;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
 
@@ -50,4 +51,5 @@ public interface ApplicationManager {
   public void deleteApplicationVersion(String appId, String versionId);
   public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId);
   public Environment getEnvironment(String appId, String versionId, String instanceId);
+  public ArrayList<Application> getListApplication();
 }
