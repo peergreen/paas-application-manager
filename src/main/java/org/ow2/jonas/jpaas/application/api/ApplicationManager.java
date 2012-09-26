@@ -35,10 +35,10 @@ import java.util.concurrent.Future;
 
 public interface ApplicationManager {
 
-  public Application createApplication(String cloudApplicationDescritor);
-  public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor);
+  public Application createApplication(String cloudApplicationDescritor) throws ApplicationManagerBeanException;
+  public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException;
   public void notifyArtefactUploades(String appId, String versionId, String artefactId);
-  public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor);
+  public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException;
   public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId);
   public void stopApplicationVersionInstance();
   public List<Application> findApplications();

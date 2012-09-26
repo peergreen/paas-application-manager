@@ -44,17 +44,52 @@
 
   <dependencies>
     <dependency>
-       <groupId>org.jboss.spec</groupId>
-       <artifactId>jboss-javaee-6.0</artifactId>
-       <version>1.0.0.Final</version>
-       <type>pom</type>
-       <scope>provided</scope>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <version>1.0.0.Final</version>
+      <type>pom</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.ow2.jonas.jpaas.jpaas-manager-api</groupId>
       <artifactId>jpaas-manager-api</artifactId>
       <version>1.0.0-SNAPSHOT</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.bonita</groupId>
+      <artifactId>bonita-server</artifactId>
+      <version>5.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.bonita</groupId>
+      <artifactId>bonita-client</artifactId>
+      <version>5.6.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.easybeans</groupId>
+      <artifactId>easybeans-component-smartclient</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.easybeans.osgi</groupId>
+      <artifactId>easybeans-osgi-annotations</artifactId>
+      <version>1.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.bundles</groupId>
+      <artifactId>ow2-util-log</artifactId>
+      <version>1.0.34-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.jonas.jpaas.system-representation</groupId>
+      <artifactId>system-representation-vo</artifactId>
+      <version>1.1.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ow2.jonas.jpaas.system-representation</groupId>
+      <artifactId>system-representation-ejb</artifactId>
+      <version>1.1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
@@ -78,7 +113,17 @@
         </goals>
         <configuration>
           <instructions>
-            <_include>-target/classes/META-INF/${project.artifactId}.bnd</_include>
+            <Bundle-Activator>org.ow2.easybeans.osgi.ejbjar.Activator</Bundle-Activator>
+            <DynamicImport-Package>*</DynamicImport-Package>
+            <Export-Package>org.ow2.jonas.jpaas.application.api</Export-Package>
+            <Import-Package>!com.thoughtworks.*,!org.jboss.*,!org.apache.tools.ant,!org.apache.tools.ant.*,!org.ow2.util.asm,*</Import-Package>
+            <Private-Package>org.ow2.jonas.jpaas.application.bean</Private-Package>
+            <Include-Resource>{maven-resources},${project.basedir}/src/process/CreateApplication/CreateApplication--1.0.bar,
+              ${project.basedir}/src/process/CreateApplication/CreateApplicationVersion--1.0.bar,
+              ${project.basedir}/src/process/CreateApplication/CreateApplicationVersionInstance--1.0.bar,
+              src/main/resources</Include-Resource>
+            <Embed-Dependency>bonita-client</Embed-Dependency>
+            <Embed-Transitive>false</Embed-Transitive>
           </instructions>
         </configuration>
       </plugin>

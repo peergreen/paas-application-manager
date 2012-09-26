@@ -1,4 +1,0 @@
-Bundle-Activator org.ow2.easybeans.osgi.ejbjar.Activator
-DynamicImport-Package *
-Export-Package org.ow2.jonas.jpaas.application.api
-Private-Package org.ow2.jonas.jpaas.application.impl
