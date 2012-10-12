@@ -53,7 +53,6 @@ import org.ow2.jonas.jpaas.sr.facade.vo.DeployableVO;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
-import javax.annotation.Resource;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -68,10 +67,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Stateless(mappedName="ApplicationManagerBean")
@@ -95,13 +96,13 @@ public class ApplicationManagerBean implements ApplicationManager {
     private QueryRuntimeAPI queryRuntimeAPIHistory;
     private LoginContext loginContext = null;
 
-    @Resource
-    private String processCreateApplication = "CreateApplication--1.0.bar";  // default value overrides by specific deployment descriptor value
-    @Resource
-    private String processCreateApplicationVersion = "CreateApplicationVersion--1.0.bar";  // default value overrides by specific deployment descriptor value
-    @Resource
-    private String processCreateApplicationVersionInstance = "CreateApplicationVersionInstance--1.0.bar";  // default value overrides by specific deployment descriptor value
 
+    private String processCreateApplication = "CreateApplication--1.0.bar";
+    private String processCreateApplicationVersion = "CreateApplicationVersion--1.0.bar";
+    private String processCreateApplicationVersionInstance = "CreateApplicationVersionInstance--1.0.bar";
+    private String processStartApplicationVersionInstance = "StartApplicationVersionInstance--1.0.bar";
+    private String subProcessDeployDeployable = "DeployDeployable--1.0.bar";
+    private String subProcessCreateLoadBalancer = "CreateLoadBalancer--1.0.bar";
 
 
     public ApplicationManagerBean() throws ApplicationManagerBeanException {
@@ -245,7 +246,8 @@ public class ApplicationManagerBean implements ApplicationManager {
 
     public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException {
         //TODO
-        System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called : " + cloudApplicationVersionInstanceDescriptor + deploymentDescriptor);
+        System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called : " +
+                cloudApplicationVersionInstanceDescriptor + "," + deploymentDescriptor);
         final Map param = new HashMap();
         param.put("cloudApplicationVersionDescriptor", cloudApplicationVersionInstanceDescriptor);
         param.put("deploymentDescriptor", deploymentDescriptor);
@@ -309,10 +311,68 @@ public class ApplicationManagerBean implements ApplicationManager {
         }
     }
 
-    public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) {
-        //TODO
-        System.out.println("JPAAS-APPLICATION-MANAGER / startApplicationVersionInstance called");
-        return null;
+    public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException {
+        System.out.println("JPAAS-APPLICATION-MANAGER / startApplicationVersionInstance called : " + appId + ", "
+                + versionId + ", " + instanceId);
+        final Map param = new HashMap();
+        param.put("appId", appId);
+        param.put("versionId", versionId);
+        param.put("instanceId", instanceId);
+        // deploy process if necessary
+        login();
+        deployProcess(subProcessDeployDeployable);
+        deployProcess(subProcessCreateLoadBalancer);
+        final ProcessDefinitionUUID uuidProcessprocessStartApplicationVersionInstance =
+                deployProcess(processStartApplicationVersionInstance);
+
+        if (uuidProcessprocessStartApplicationVersionInstance != null) {
+            ExecutorService es = Executors.newFixedThreadPool(3);
+            final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+                public ApplicationVersionInstance call() throws Exception {
+                    try {
+                        login();
+                        ProcessInstanceUUID uuidInstance =
+                                runtimeAPI.instantiateProcess(uuidProcessprocessStartApplicationVersionInstance, param);
+
+                        // wait until processInstance is finished
+                        Set<LightProcessInstance> lightProcessInstances =
+                                queryRuntimeAPIHistory.getLightProcessInstances();
+                        waitProcessInstanceUUIDIsFinished(uuidInstance);
+
+
+                        /*
+                        // read Variable process instance to detect errors
+                        String variableErrorRouteur =
+                                (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
+
+                        if (!variableErrorRouteur.equals("")) {
+                            throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
+                                    + variableErrorRouteur);
+                        } else {
+
+                        }*/
+
+                        return null;
+
+                    } catch (ProcessNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " startApplicationVersionInstance, process not found");
+                    } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " startApplicationVersionInstance, variable not found");
+                    } finally {
+                        logger.info("JPAAS-APPLICATION-MANAGER / startApplicationVersionInstance finished.");
+                        logout();
+                    }
+                }
+            });
+            return future;
+        } else {
+            throw (new ApplicationManagerBeanException("process startApplicationVersionInstance can't be " +
+                    "deploy on server..."));
+        }
     }
 
     public void stopApplicationVersionInstance() {

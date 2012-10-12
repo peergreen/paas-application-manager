@@ -39,7 +39,7 @@ public interface ApplicationManager {
   public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException;
   public void notifyArtefactUploades(String appId, String versionId, String artefactId);
   public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException;
-  public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId);
+  public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
   public void stopApplicationVersionInstance();
   public List<Application> findApplications();
   public List<ApplicationVersion> findApplicationVersion(String appId);
