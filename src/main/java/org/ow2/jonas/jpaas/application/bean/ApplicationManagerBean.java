@@ -101,8 +101,9 @@ public class ApplicationManagerBean implements ApplicationManager {
     private String processCreateApplicationVersion = "CreateApplicationVersion--1.0.bar";
     private String processCreateApplicationVersionInstance = "CreateApplicationVersionInstance--1.0.bar";
     private String processStartApplicationVersionInstance = "StartApplicationVersionInstance--1.0.bar";
-    private String subProcessDeployDeployable = "DeployDeployable--1.0.bar";
+    private String subProcessDeployOnContainer = "DeployOnContainer--1.0.bar";
     private String subProcessCreateLoadBalancer = "CreateLoadBalancer--1.0.bar";
+    private String processScaleUp = "ScaleUp--1.0.bar";
 
 
     public ApplicationManagerBean() throws ApplicationManagerBeanException {
@@ -249,7 +250,7 @@ public class ApplicationManagerBean implements ApplicationManager {
         System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called : " +
                 cloudApplicationVersionInstanceDescriptor + "," + deploymentDescriptor);
         final Map param = new HashMap();
-        param.put("cloudApplicationVersionDescriptor", cloudApplicationVersionInstanceDescriptor);
+        param.put("cloudApplicationVersionInstanceDescriptor", cloudApplicationVersionInstanceDescriptor);
         param.put("deploymentDescriptor", deploymentDescriptor);
         // deploy process if necessary
         login();
@@ -320,7 +321,7 @@ public class ApplicationManagerBean implements ApplicationManager {
         param.put("instanceId", instanceId);
         // deploy process if necessary
         login();
-        deployProcess(subProcessDeployDeployable);
+        deployProcess(subProcessDeployOnContainer);
         deployProcess(subProcessCreateLoadBalancer);
         final ProcessDefinitionUUID uuidProcessprocessStartApplicationVersionInstance =
                 deployProcess(processStartApplicationVersionInstance);
@@ -556,6 +557,69 @@ public class ApplicationManagerBean implements ApplicationManager {
         System.out.println("JPAAS-APPLICATION-MANAGER / getEnvironment called");
         return null;
     }
+
+    public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId)
+            throws ApplicationManagerBeanException {
+            System.out.println("JPAAS-APPLICATION-MANAGER / ScaleUp called : " + appId + ", "
+                    + versionId + ", " + instanceId);
+            final Map param = new HashMap();
+            param.put("appId", appId);
+            param.put("versionId", versionId);
+            param.put("instanceId", instanceId);
+            // deploy process if necessary
+            login();
+            final ProcessDefinitionUUID uuidProcessScaleUp = deployProcess(processScaleUp);
+
+            if (uuidProcessScaleUp != null) {
+                ExecutorService es = Executors.newFixedThreadPool(3);
+                final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+                    public ApplicationVersionInstance call() throws Exception {
+                        try {
+                            login();
+                            ProcessInstanceUUID uuidInstance =
+                                    runtimeAPI.instantiateProcess(uuidProcessScaleUp, param);
+
+                            // wait until processInstance is finished
+                            Set<LightProcessInstance> lightProcessInstances =
+                                    queryRuntimeAPIHistory.getLightProcessInstances();
+                            waitProcessInstanceUUIDIsFinished(uuidInstance);
+
+
+                            /*
+                            // read Variable process instance to detect errors
+                            String variableErrorRouteur =
+                                    (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
+
+                            if (!variableErrorRouteur.equals("")) {
+                                throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
+                                        + variableErrorRouteur);
+                            } else {
+
+                            }*/
+
+                            return null;
+
+                        } catch (ProcessNotFoundException e) {
+                            e.printStackTrace();
+                            throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                    " ScaleUp, process not found");
+                        } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
+                            e.printStackTrace();
+                            throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                    " ScaleUp, variable not found");
+                        } finally {
+                            logger.info("JPAAS-APPLICATION-MANAGER / ScaleUp finished.");
+                            logout();
+                        }
+                    }
+                });
+                return future;
+            } else {
+                throw (new ApplicationManagerBeanException("process ScaleUp can't be " +
+                        "deploy on server..."));
+            }
+        }
+
     public ArrayList<Application> getListApplication() {
         return listApplication;
     }

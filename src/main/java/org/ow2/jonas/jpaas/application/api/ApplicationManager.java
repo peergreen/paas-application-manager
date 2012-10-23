@@ -52,4 +52,6 @@ public interface ApplicationManager {
   public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId);
   public Environment getEnvironment(String appId, String versionId, String instanceId);
   public ArrayList<Application> getListApplication();
+    //Temporary to test ScaleUp
+    public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
 }
