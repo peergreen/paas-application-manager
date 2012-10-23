@@ -39,6 +39,7 @@ import org.ow2.bonita.util.AccessorUtil;
 import org.ow2.bonita.util.BonitaConstants;
 import org.ow2.bonita.util.BusinessArchiveFactory;
 import org.ow2.bonita.util.SimpleCallbackHandler;
+import org.ow2.easybeans.osgi.annotation.OSGiResource;
 import org.ow2.jonas.jpaas.application.api.ApplicationManager;
 import org.ow2.jonas.jpaas.application.api.ApplicationManagerBeanException;
 import org.ow2.jonas.jpaas.manager.api.Application;
@@ -46,6 +47,10 @@ import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
 import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
 import org.ow2.jonas.jpaas.manager.api.Deployable;
 import org.ow2.jonas.jpaas.manager.api.Environment;
+import org.ow2.jonas.jpaas.sr.facade.api.ISrApplicationFacade;
+import org.ow2.jonas.jpaas.sr.facade.api.ISrApplicationVersionFacade;
+import org.ow2.jonas.jpaas.sr.facade.api.ISrApplicationVersionInstanceFacade;
+
 import org.ow2.jonas.jpaas.sr.facade.vo.ApplicationVO;
 import org.ow2.jonas.jpaas.sr.facade.vo.ApplicationVersionInstanceVO;
 import org.ow2.jonas.jpaas.sr.facade.vo.ApplicationVersionVO;
@@ -74,6 +79,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+
+
 
 @Stateless(mappedName="ApplicationManagerBean")
 @Local(ApplicationManager.class)
@@ -105,6 +113,14 @@ public class ApplicationManagerBean implements ApplicationManager {
     private String subProcessCreateLoadBalancer = "CreateLoadBalancer--1.0.bar";
     private String processScaleUp = "ScaleUp--1.0.bar";
 
+
+    @OSGiResource
+    private ISrApplicationFacade appSR;
+    @OSGiResource
+    private ISrApplicationVersionFacade appVersionSR;
+    @OSGiResource
+    private ISrApplicationVersionInstanceFacade appVersionInstanceSR;
+    
 
     public ApplicationManagerBean() throws ApplicationManagerBeanException {
         login();
@@ -382,160 +398,176 @@ public class ApplicationManagerBean implements ApplicationManager {
     }
 
     public List<Application> findApplications() {
-        //TODO
+    	
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplications called");
+        
+        List<ApplicationVO> appVOList = appSR.findApplications("1");
+        
+        List <Application> appList = createApplicationList(appVOList);
+        
+        return appList;
 
-        //Test code that returns a list of Applications instead null
-
-        this.listApplication= new ArrayList<Application>();
-        //Application 1
-        Application app1=new Application();
-        app1.setAppId("23645");
-        app1.setName("My first application");
-        ArrayList<String> requirements1= new ArrayList<String>();
-        requirements1.add("requirement1");
-        requirements1.add("requirement2");
-        app1.setRequirements(requirements1);
-
-        //Version 1 of Application 1
-        ApplicationVersion version1 = new ApplicationVersion();
-        version1.setVersionId("23462");
-        version1.setVersionLabel("Version 1 of Application  1");
-        version1.setAppId("23645");
-
-        //Instance 1 of Version 1
-        ApplicationVersionInstance instance1=new ApplicationVersionInstance();
-        instance1.setInstanceId("196");
-        instance1.setAppId("23645");
-        instance1.setVersionId("23462");
-        instance1.setInstanceName("1rst instance of the 1rst version of the 1rst application");
-        instance1.setState(ApplicationVersionInstance.INSTANCE_STARTED);
-
-        version1.getListApplicationVersionInstance().add(instance1);
-
-        //Deployable 1 of Version 1
-        Deployable dep1= new Deployable();
-        dep1.setDeployabledId("5024657");
-        dep1.setDeployableName("my war");
-        dep1.setUploaded(true);
-
-
-        //Deployable 2 of Version 1
-        Deployable dep2= new Deployable();
-        dep2.setDeployabledId("631256");
-        dep2.setDeployableName("my ear");
-        dep2.setUploaded(true);
-
-        version1.getSortedDeployablesList().add(dep1);
-        version1.getSortedDeployablesList().add(dep2);
-
-
-
-        //Version 2 of Application 1
-        ApplicationVersion version2 = new ApplicationVersion();
-        version2.setVersionId("635478");
-        version2.setVersionLabel("Version 2 of Application  1");
-
-        //Instance 1 of Version 2
-        ApplicationVersionInstance instance2=new ApplicationVersionInstance();
-        instance2.setInstanceId("638");
-        instance2.setAppId("23645");
-        instance2.setVersionId("635478");
-        instance2.setInstanceName("2nd instance of the 2 nd version of the 1srt application");
-        instance2.setState(ApplicationVersionInstance.INSTANCE_RUNNING);
-
-        version2.getListApplicationVersionInstance().add(instance2);
-
-        //Deployable 1 of Version 2
-        Deployable dep3= new Deployable();
-        dep3.setDeployabledId("656547");
-        dep3.setDeployableName("my bundle");
-        dep3.setUploaded(true);
-
-
-        //Deployable 2 of Version 2
-        Deployable dep4= new Deployable();
-        dep4.setDeployabledId("9875212");
-        dep4.setDeployableName("my ear");
-        dep4.setUploaded(true);
-
-        version2.getSortedDeployablesList().add(dep3);
-        version2.getSortedDeployablesList().add(dep4);
-
-
-        app1.getListApplicationVersion().add(version1);
-        app1.getListApplicationVersion().add(version2);
-
-        //-----------------------------------------------------------------------------------
-
-        //Application 2
-        Application app2=new Application();
-        app2.setAppId("23645");
-        app2.setName("My second application");
-        ArrayList<String> requirements2= new ArrayList<String>();
-        requirements2.add("requirement1");
-        requirements2.add("requirement2");
-        app2.setRequirements(requirements2);
-
-        //Version 1 of Application 2
-        ApplicationVersion version3 = new ApplicationVersion();
-        version3.setVersionId("853214");
-        version3.setAppId("23645");
-        version3.setVersionLabel("Version 1 of Application  2");
-
-        //Instance 1 of Version 2
-        ApplicationVersionInstance instance3=new ApplicationVersionInstance();
-        instance3.setInstanceId("789");
-        instance3.setVersionId("853214");
-        instance3.setAppId("23645");
-        instance3.setInstanceName("1rst instance of the 1rst version of 2nd application");
-        instance3.setState(ApplicationVersionInstance.INSTANCE_STOPPED);
-
-        version3.getListApplicationVersionInstance().add(instance3);
-
-
-        app2.getListApplicationVersion().add(version3);
-
-
-
-        listApplication.add(app1);
-        listApplication.add(app2);
-
-
-
-
-        return listApplication;
     }
-
+    
     public List<ApplicationVersion> findApplicationVersion(String appId) {
-        //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplicationVersion called");
-        return null;
+        List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
+        
+        List <ApplicationVersion> appVersionList = createApplicationVersionList(appVersionVOList);
+        
+        return appVersionList;   
     }
 
     public List<ApplicationVersionInstance> findApplicationVersionsInstances(String appId, String versionId) {
-        //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplicationVersionsInstances called");
-        return null;
-    }
+        
+        List<ApplicationVersionInstance> appVersionInstanceList = null;
+        
+        List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
+        
+        for (ApplicationVersionVO appVersionVO:appVersionVOList) {
+        	
+        	if (appVersionVO.getVersionId().equals(versionId)) {
+        		appVersionInstanceList = createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList());
+                
+        	}
+        }
 
+        return appVersionInstanceList;   
+    }
+    
     public Application getApplication(String appId) {
-        //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplication called");
-        return null;
+        
+        ApplicationVO appVO = appSR.getApplication(appId);
+        
+        return createApplication(appVO);
     }
 
+    
     public ApplicationVersion getApplicationVersion(String appId, String versionId) {
-        //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplicationVersion called");
+        List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
+        
+        for (ApplicationVersionVO appVersionVO:appVersionVOList) {
+        	
+        	if (appVersionVO.getVersionId().equals(versionId)) {
+        		return createApplicationVersion(appVersionVO);
+               
+        	}
+        }
+        
         return null;
     }
 
     public ApplicationVersionInstance getApplicationVersionInstance(String appId, String versionId, String instanceId) {
-        //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplicationVersionInstance called");
+        List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
+        
+        for (ApplicationVersionVO appVersionVO:appVersionVOList) {
+        	
+        	if (appVersionVO.getVersionId().equals(versionId)) {
+        		
+        		for (ApplicationVersionInstanceVO appVersionInstanceVO:appVersionVO.getApplicationVersionInstanceList()) {
+        			
+        			if (appVersionInstanceVO.getId().equals(instanceId)) {
+        				return createApplicationVersionInstance(appVersionInstanceVO);
+        			}       		
+        		}
+        		               
+        	}
+        }
         return null;
+
     }
+    
+    private List<Application> createApplicationList(List <ApplicationVO> appVOList) {
+    	List<Application> appList = new ArrayList<Application>();
+    	
+        for (ApplicationVO appVO:appVOList) {
+        	Application app = createApplication(appVO);	
+        	appList.add(app);       		
+        }
+        
+        return appList;
+    }
+    
+    private Application createApplication(ApplicationVO appVO) {
+    	Application app = new Application();
+    	app.setAppId(appVO.getId());
+    	app.setDescription(appVO.getDescription());
+    	app.setName(appVO.getName());
+    	app.setRequirements(appVO.getRequirements());      	
+        	
+    	app.setListApplicationVersion(createApplicationVersionList(appVO.getApplicationVersionList()));
+    	return app;
+    }
+    
+    
+    private List<ApplicationVersion> createApplicationVersionList(List <ApplicationVersionVO> appVersionVOList) {
+    	
+    	List<ApplicationVersion> appVersionList = new ArrayList<ApplicationVersion>();
+    	
+    	for (ApplicationVersionVO appVersionVO : appVersionVOList) {
+    		
+    		ApplicationVersion appVersion = createApplicationVersion(appVersionVO);
+    		appVersionList.add(appVersion);
+    		
+    	}
+    	return appVersionList;
+    }
+    
+    private ApplicationVersion createApplicationVersion(ApplicationVersionVO appVersionVO) {
+    	
+    	ApplicationVersion appVersion = new ApplicationVersion();
+		appVersion.setAppId(appVersionVO.getAppId());
+		appVersion.setVersionId(appVersionVO.getVersionId());
+		appVersion.setVersionLabel(appVersionVO.getLabel());
+		appVersion.setRequirements(appVersionVO.getRequirements());
+		
+		for  (DeployableVO deployableVO : appVersionVO.getDeployableList()) {
+			
+			Deployable deployable = new Deployable();
+			deployable.setDeployabledId(deployableVO.getId());
+			deployable.setDeployableName(deployableVO.getName());
+			deployable.setLocationUrl(deployableVO.getUrl());
+			deployable.setRequirements(deployableVO.getRequirements());
+			
+			appVersion.getSortedDeployablesList().add(deployable);
+		}
+		
+		appVersion.setListApplicationVersionInstance(createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList()));
+		
+		return appVersion;
+
+    }
+    
+    
+    private List<ApplicationVersionInstance> createApplicationVersionInstanceList(List <ApplicationVersionInstanceVO> appVersionInstanceVOList) {
+    	List<ApplicationVersionInstance> appVersionInstanceList = new ArrayList<ApplicationVersionInstance>();
+    	
+    	for (ApplicationVersionInstanceVO appVersionInstanceVO : appVersionInstanceVOList) {
+    		ApplicationVersionInstance appVersionInstance = createApplicationVersionInstance(appVersionInstanceVO);   		
+    		appVersionInstanceList.add(appVersionInstance);
+			
+		}
+    	return appVersionInstanceList;
+    }
+
+    
+    private ApplicationVersionInstance createApplicationVersionInstance(ApplicationVersionInstanceVO appVersionInstanceVO) {
+    	
+    	ApplicationVersionInstance appVersionInstance = new ApplicationVersionInstance();
+		
+		appVersionInstance.setAppId(appVersionInstanceVO.getAppId());
+		appVersionInstance.setInstanceId(appVersionInstanceVO.getId());
+		appVersionInstance.setVersionId(appVersionInstanceVO.getVersionId());
+		appVersionInstance.setStateStr(appVersionInstanceVO.getState());
+		
+		return appVersionInstance;
+    	
+    }
+    	
 
     public void deleteApplication(String appId) {
         //TODO
