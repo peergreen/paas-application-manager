@@ -54,4 +54,5 @@ public interface ApplicationManager {
   public ArrayList<Application> getListApplication();
     //Temporary to test ScaleUp
     public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
+    public Future<ApplicationVersionInstance> scaleDown(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
 }

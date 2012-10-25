@@ -112,6 +112,10 @@ public class ApplicationManagerBean implements ApplicationManager {
     private String subProcessDeployOnContainer = "DeployOnContainer--1.0.bar";
     private String subProcessCreateLoadBalancer = "CreateLoadBalancer--1.0.bar";
     private String processScaleUp = "ScaleUp--1.0.bar";
+    private String subProcessInstanciateConnector = "InstanciateConnector--1.0.bar";
+    private String subProcessInstanciateConnectors = "InstanciateConnectors--1.0.bar";
+    private String subProcessInstanciateContainer = "InstanciateContainer--1.0.bar";
+    private String processScaleDown = "ScaleDown--1.0.bar";
 
 
     @OSGiResource
@@ -120,7 +124,7 @@ public class ApplicationManagerBean implements ApplicationManager {
     private ISrApplicationVersionFacade appVersionSR;
     @OSGiResource
     private ISrApplicationVersionInstanceFacade appVersionInstanceSR;
-    
+
 
     public ApplicationManagerBean() throws ApplicationManagerBeanException {
         login();
@@ -398,176 +402,176 @@ public class ApplicationManagerBean implements ApplicationManager {
     }
 
     public List<Application> findApplications() {
-    	
+
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplications called");
-        
+
         List<ApplicationVO> appVOList = appSR.findApplications("1");
-        
+
         List <Application> appList = createApplicationList(appVOList);
-        
+
         return appList;
 
     }
-    
+
     public List<ApplicationVersion> findApplicationVersion(String appId) {
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplicationVersion called");
         List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
-        
+
         List <ApplicationVersion> appVersionList = createApplicationVersionList(appVersionVOList);
-        
-        return appVersionList;   
+
+        return appVersionList;
     }
 
     public List<ApplicationVersionInstance> findApplicationVersionsInstances(String appId, String versionId) {
         System.out.println("JPAAS-APPLICATION-MANAGER / findApplicationVersionsInstances called");
-        
+
         List<ApplicationVersionInstance> appVersionInstanceList = null;
-        
+
         List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
-        
+
         for (ApplicationVersionVO appVersionVO:appVersionVOList) {
-        	
-        	if (appVersionVO.getVersionId().equals(versionId)) {
-        		appVersionInstanceList = createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList());
-                
-        	}
+
+            if (appVersionVO.getVersionId().equals(versionId)) {
+                appVersionInstanceList = createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList());
+
+            }
         }
 
-        return appVersionInstanceList;   
+        return appVersionInstanceList;
     }
-    
+
     public Application getApplication(String appId) {
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplication called");
-        
+
         ApplicationVO appVO = appSR.getApplication(appId);
-        
+
         return createApplication(appVO);
     }
 
-    
+
     public ApplicationVersion getApplicationVersion(String appId, String versionId) {
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplicationVersion called");
         List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
-        
+
         for (ApplicationVersionVO appVersionVO:appVersionVOList) {
-        	
-        	if (appVersionVO.getVersionId().equals(versionId)) {
-        		return createApplicationVersion(appVersionVO);
-               
-        	}
+
+            if (appVersionVO.getVersionId().equals(versionId)) {
+                return createApplicationVersion(appVersionVO);
+
+            }
         }
-        
+
         return null;
     }
 
     public ApplicationVersionInstance getApplicationVersionInstance(String appId, String versionId, String instanceId) {
         System.out.println("JPAAS-APPLICATION-MANAGER / getApplicationVersionInstance called");
         List<ApplicationVersionVO> appVersionVOList = appSR.getApplication(appId).getApplicationVersionList();
-        
+
         for (ApplicationVersionVO appVersionVO:appVersionVOList) {
-        	
-        	if (appVersionVO.getVersionId().equals(versionId)) {
-        		
-        		for (ApplicationVersionInstanceVO appVersionInstanceVO:appVersionVO.getApplicationVersionInstanceList()) {
-        			
-        			if (appVersionInstanceVO.getId().equals(instanceId)) {
-        				return createApplicationVersionInstance(appVersionInstanceVO);
-        			}       		
-        		}
-        		               
-        	}
+
+            if (appVersionVO.getVersionId().equals(versionId)) {
+
+                for (ApplicationVersionInstanceVO appVersionInstanceVO:appVersionVO.getApplicationVersionInstanceList()) {
+
+                    if (appVersionInstanceVO.getId().equals(instanceId)) {
+                        return createApplicationVersionInstance(appVersionInstanceVO);
+                    }
+                }
+
+            }
         }
         return null;
 
     }
-    
+
     private List<Application> createApplicationList(List <ApplicationVO> appVOList) {
-    	List<Application> appList = new ArrayList<Application>();
-    	
+        List<Application> appList = new ArrayList<Application>();
+
         for (ApplicationVO appVO:appVOList) {
-        	Application app = createApplication(appVO);	
-        	appList.add(app);       		
+            Application app = createApplication(appVO);
+            appList.add(app);
         }
-        
+
         return appList;
     }
-    
+
     private Application createApplication(ApplicationVO appVO) {
-    	Application app = new Application();
-    	app.setAppId(appVO.getId());
-    	app.setDescription(appVO.getDescription());
-    	app.setName(appVO.getName());
-    	app.setRequirements(appVO.getRequirements());      	
-        	
-    	app.setListApplicationVersion(createApplicationVersionList(appVO.getApplicationVersionList()));
-    	return app;
+        Application app = new Application();
+        app.setAppId(appVO.getId());
+        app.setDescription(appVO.getDescription());
+        app.setName(appVO.getName());
+        app.setRequirements(appVO.getRequirements());
+
+        app.setListApplicationVersion(createApplicationVersionList(appVO.getApplicationVersionList()));
+        return app;
     }
-    
-    
+
+
     private List<ApplicationVersion> createApplicationVersionList(List <ApplicationVersionVO> appVersionVOList) {
-    	
-    	List<ApplicationVersion> appVersionList = new ArrayList<ApplicationVersion>();
-    	
-    	for (ApplicationVersionVO appVersionVO : appVersionVOList) {
-    		
-    		ApplicationVersion appVersion = createApplicationVersion(appVersionVO);
-    		appVersionList.add(appVersion);
-    		
-    	}
-    	return appVersionList;
+
+        List<ApplicationVersion> appVersionList = new ArrayList<ApplicationVersion>();
+
+        for (ApplicationVersionVO appVersionVO : appVersionVOList) {
+
+            ApplicationVersion appVersion = createApplicationVersion(appVersionVO);
+            appVersionList.add(appVersion);
+
+        }
+        return appVersionList;
     }
-    
+
     private ApplicationVersion createApplicationVersion(ApplicationVersionVO appVersionVO) {
-    	
-    	ApplicationVersion appVersion = new ApplicationVersion();
-		appVersion.setAppId(appVersionVO.getAppId());
-		appVersion.setVersionId(appVersionVO.getVersionId());
-		appVersion.setVersionLabel(appVersionVO.getLabel());
-		appVersion.setRequirements(appVersionVO.getRequirements());
-		
-		for  (DeployableVO deployableVO : appVersionVO.getDeployableList()) {
-			
-			Deployable deployable = new Deployable();
-			deployable.setDeployabledId(deployableVO.getId());
-			deployable.setDeployableName(deployableVO.getName());
-			deployable.setLocationUrl(deployableVO.getUrl());
-			deployable.setRequirements(deployableVO.getRequirements());
-			
-			appVersion.getSortedDeployablesList().add(deployable);
-		}
-		
-		appVersion.setListApplicationVersionInstance(createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList()));
-		
-		return appVersion;
+
+        ApplicationVersion appVersion = new ApplicationVersion();
+        appVersion.setAppId(appVersionVO.getAppId());
+        appVersion.setVersionId(appVersionVO.getVersionId());
+        appVersion.setVersionLabel(appVersionVO.getLabel());
+        appVersion.setRequirements(appVersionVO.getRequirements());
+
+        for  (DeployableVO deployableVO : appVersionVO.getDeployableList()) {
+
+            Deployable deployable = new Deployable();
+            deployable.setDeployabledId(deployableVO.getId());
+            deployable.setDeployableName(deployableVO.getName());
+            deployable.setLocationUrl(deployableVO.getUrl());
+            deployable.setRequirements(deployableVO.getRequirements());
+
+            appVersion.getSortedDeployablesList().add(deployable);
+        }
+
+        appVersion.setListApplicationVersionInstance(createApplicationVersionInstanceList(appVersionVO.getApplicationVersionInstanceList()));
+
+        return appVersion;
 
     }
-    
-    
+
+
     private List<ApplicationVersionInstance> createApplicationVersionInstanceList(List <ApplicationVersionInstanceVO> appVersionInstanceVOList) {
-    	List<ApplicationVersionInstance> appVersionInstanceList = new ArrayList<ApplicationVersionInstance>();
-    	
-    	for (ApplicationVersionInstanceVO appVersionInstanceVO : appVersionInstanceVOList) {
-    		ApplicationVersionInstance appVersionInstance = createApplicationVersionInstance(appVersionInstanceVO);   		
-    		appVersionInstanceList.add(appVersionInstance);
-			
-		}
-    	return appVersionInstanceList;
+        List<ApplicationVersionInstance> appVersionInstanceList = new ArrayList<ApplicationVersionInstance>();
+
+        for (ApplicationVersionInstanceVO appVersionInstanceVO : appVersionInstanceVOList) {
+            ApplicationVersionInstance appVersionInstance = createApplicationVersionInstance(appVersionInstanceVO);
+            appVersionInstanceList.add(appVersionInstance);
+
+        }
+        return appVersionInstanceList;
     }
 
-    
+
     private ApplicationVersionInstance createApplicationVersionInstance(ApplicationVersionInstanceVO appVersionInstanceVO) {
-    	
-    	ApplicationVersionInstance appVersionInstance = new ApplicationVersionInstance();
-		
-		appVersionInstance.setAppId(appVersionInstanceVO.getAppId());
-		appVersionInstance.setInstanceId(appVersionInstanceVO.getId());
-		appVersionInstance.setVersionId(appVersionInstanceVO.getVersionId());
-		appVersionInstance.setStateStr(appVersionInstanceVO.getState());
-		
-		return appVersionInstance;
-    	
+
+        ApplicationVersionInstance appVersionInstance = new ApplicationVersionInstance();
+
+        appVersionInstance.setAppId(appVersionInstanceVO.getAppId());
+        appVersionInstance.setInstanceId(appVersionInstanceVO.getId());
+        appVersionInstance.setVersionId(appVersionInstanceVO.getVersionId());
+        appVersionInstance.setStateStr(appVersionInstanceVO.getState());
+
+        return appVersionInstance;
+
     }
-    	
+
 
     public void deleteApplication(String appId) {
         //TODO
@@ -592,65 +596,133 @@ public class ApplicationManagerBean implements ApplicationManager {
 
     public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId)
             throws ApplicationManagerBeanException {
-            System.out.println("JPAAS-APPLICATION-MANAGER / ScaleUp called : " + appId + ", "
-                    + versionId + ", " + instanceId);
-            final Map param = new HashMap();
-            param.put("appId", appId);
-            param.put("versionId", versionId);
-            param.put("instanceId", instanceId);
-            // deploy process if necessary
-            login();
-            final ProcessDefinitionUUID uuidProcessScaleUp = deployProcess(processScaleUp);
+        System.out.println("JPAAS-APPLICATION-MANAGER / ScaleUp called : " + appId + ", "
+                + versionId + ", " + instanceId);
+        final Map param = new HashMap();
+        param.put("appId", appId);
+        param.put("versionId", versionId);
+        param.put("instanceId", instanceId);
+        // deploy process if necessary
+        login();
+        deployProcess(subProcessDeployOnContainer);
+        deployProcess(subProcessCreateLoadBalancer);
+        deployProcess(subProcessInstanciateConnector);
+        deployProcess(subProcessInstanciateConnectors);
+        deployProcess(subProcessInstanciateContainer);
 
-            if (uuidProcessScaleUp != null) {
-                ExecutorService es = Executors.newFixedThreadPool(3);
-                final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
-                    public ApplicationVersionInstance call() throws Exception {
-                        try {
-                            login();
-                            ProcessInstanceUUID uuidInstance =
-                                    runtimeAPI.instantiateProcess(uuidProcessScaleUp, param);
+        final ProcessDefinitionUUID uuidProcessScaleUp = deployProcess(processScaleUp);
 
-                            // wait until processInstance is finished
-                            Set<LightProcessInstance> lightProcessInstances =
-                                    queryRuntimeAPIHistory.getLightProcessInstances();
-                            waitProcessInstanceUUIDIsFinished(uuidInstance);
+        if (uuidProcessScaleUp != null) {
+            ExecutorService es = Executors.newFixedThreadPool(3);
+            final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+                public ApplicationVersionInstance call() throws Exception {
+                    try {
+                        login();
+                        ProcessInstanceUUID uuidInstance =
+                                runtimeAPI.instantiateProcess(uuidProcessScaleUp, param);
+
+                        // wait until processInstance is finished
+                        Set<LightProcessInstance> lightProcessInstances =
+                                queryRuntimeAPIHistory.getLightProcessInstances();
+                        waitProcessInstanceUUIDIsFinished(uuidInstance);
 
 
-                            /*
-                            // read Variable process instance to detect errors
-                            String variableErrorRouteur =
-                                    (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
+                        /*
+                        // read Variable process instance to detect errors
+                        String variableErrorRouteur =
+                                (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
 
-                            if (!variableErrorRouteur.equals("")) {
-                                throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
-                                        + variableErrorRouteur);
-                            } else {
+                        if (!variableErrorRouteur.equals("")) {
+                            throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
+                                    + variableErrorRouteur);
+                        } else {
 
-                            }*/
+                        }*/
 
-                            return null;
+                        return null;
 
-                        } catch (ProcessNotFoundException e) {
-                            e.printStackTrace();
-                            throw new ApplicationManagerBeanException("Error during intantiation of the process" +
-                                    " ScaleUp, process not found");
-                        } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
-                            e.printStackTrace();
-                            throw new ApplicationManagerBeanException("Error during intantiation of the process" +
-                                    " ScaleUp, variable not found");
-                        } finally {
-                            logger.info("JPAAS-APPLICATION-MANAGER / ScaleUp finished.");
-                            logout();
-                        }
+                    } catch (ProcessNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " ScaleUp, process not found");
+                    } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " ScaleUp, variable not found");
+                    } finally {
+                        logger.info("JPAAS-APPLICATION-MANAGER / ScaleUp finished.");
+                        logout();
                     }
-                });
-                return future;
-            } else {
-                throw (new ApplicationManagerBeanException("process ScaleUp can't be " +
-                        "deploy on server..."));
-            }
+                }
+            });
+            return future;
+        } else {
+            throw (new ApplicationManagerBeanException("process ScaleUp can't be " +
+                    "deploy on server..."));
         }
+    }
+
+    public Future<ApplicationVersionInstance> scaleDown(String appId, String versionId, String instanceId)
+            throws ApplicationManagerBeanException {
+        System.out.println("JPAAS-APPLICATION-MANAGER / ScaleDown called : " + appId + ", "
+                        + versionId + ", " + instanceId);
+                final Map param = new HashMap();
+                param.put("appId", appId);
+                param.put("versionId", versionId);
+                param.put("instanceId", instanceId);
+                // deploy process if necessary
+                login();
+                final ProcessDefinitionUUID uuidProcessScaleDown = deployProcess(processScaleDown);
+
+                if (uuidProcessScaleDown != null) {
+                    ExecutorService es = Executors.newFixedThreadPool(3);
+                    final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+                        public ApplicationVersionInstance call() throws Exception {
+                            try {
+                                login();
+                                ProcessInstanceUUID uuidInstance =
+                                        runtimeAPI.instantiateProcess(uuidProcessScaleDown, param);
+
+                                // wait until processInstance is finished
+                                Set<LightProcessInstance> lightProcessInstances =
+                                        queryRuntimeAPIHistory.getLightProcessInstances();
+                                waitProcessInstanceUUIDIsFinished(uuidInstance);
+
+
+                                /*
+                                // read Variable process instance to detect errors
+                                String variableErrorRouteur =
+                                        (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
+
+                                if (!variableErrorRouteur.equals("")) {
+                                    throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
+                                            + variableErrorRouteur);
+                                } else {
+
+                                }*/
+
+                                return null;
+
+                            } catch (ProcessNotFoundException e) {
+                                e.printStackTrace();
+                                throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                        " ScaleDown, process not found");
+                            } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
+                                e.printStackTrace();
+                                throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                        " ScaleDown, variable not found");
+                            } finally {
+                                logger.info("JPAAS-APPLICATION-MANAGER / ScaleDown finished.");
+                                logout();
+                            }
+                        }
+                    });
+                    return future;
+                } else {
+                    throw (new ApplicationManagerBeanException("process ScaleDown can't be " +
+                            "deploy on server..."));
+                }
+    }
 
     public ArrayList<Application> getListApplication() {
         return listApplication;
