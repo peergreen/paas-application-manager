@@ -665,63 +665,63 @@ public class ApplicationManagerBean implements ApplicationManager {
     public Future<ApplicationVersionInstance> scaleDown(String appId, String versionId, String instanceId)
             throws ApplicationManagerBeanException {
         System.out.println("JPAAS-APPLICATION-MANAGER / ScaleDown called : " + appId + ", "
-                        + versionId + ", " + instanceId);
-                final Map param = new HashMap();
-                param.put("appId", appId);
-                param.put("versionId", versionId);
-                param.put("instanceId", instanceId);
-                // deploy process if necessary
-                login();
-                final ProcessDefinitionUUID uuidProcessScaleDown = deployProcess(processScaleDown);
+                + versionId + ", " + instanceId);
+        final Map param = new HashMap();
+        param.put("appId", appId);
+        param.put("versionId", versionId);
+        param.put("instanceId", instanceId);
+        // deploy process if necessary
+        login();
+        final ProcessDefinitionUUID uuidProcessScaleDown = deployProcess(processScaleDown);
 
-                if (uuidProcessScaleDown != null) {
-                    ExecutorService es = Executors.newFixedThreadPool(3);
-                    final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
-                        public ApplicationVersionInstance call() throws Exception {
-                            try {
-                                login();
-                                ProcessInstanceUUID uuidInstance =
-                                        runtimeAPI.instantiateProcess(uuidProcessScaleDown, param);
+        if (uuidProcessScaleDown != null) {
+            ExecutorService es = Executors.newFixedThreadPool(3);
+            final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+                public ApplicationVersionInstance call() throws Exception {
+                    try {
+                        login();
+                        ProcessInstanceUUID uuidInstance =
+                                runtimeAPI.instantiateProcess(uuidProcessScaleDown, param);
 
-                                // wait until processInstance is finished
-                                Set<LightProcessInstance> lightProcessInstances =
-                                        queryRuntimeAPIHistory.getLightProcessInstances();
-                                waitProcessInstanceUUIDIsFinished(uuidInstance);
+                        // wait until processInstance is finished
+                        Set<LightProcessInstance> lightProcessInstances =
+                                queryRuntimeAPIHistory.getLightProcessInstances();
+                        waitProcessInstanceUUIDIsFinished(uuidInstance);
 
 
-                                /*
-                                // read Variable process instance to detect errors
-                                String variableErrorRouteur =
-                                        (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
+                        /*
+                        // read Variable process instance to detect errors
+                        String variableErrorRouteur =
+                                (String) queryRuntimeAPIHistory.getProcessInstanceVariable(uuidInstance, "errorCode");
 
-                                if (!variableErrorRouteur.equals("")) {
-                                    throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
-                                            + variableErrorRouteur);
-                                } else {
+                        if (!variableErrorRouteur.equals("")) {
+                            throw new ApplicationManagerBeanException("Error during the process CreateApplicationVersionInstance : "
+                                    + variableErrorRouteur);
+                        } else {
 
-                                }*/
+                        }*/
 
-                                return null;
+                        return null;
 
-                            } catch (ProcessNotFoundException e) {
-                                e.printStackTrace();
-                                throw new ApplicationManagerBeanException("Error during intantiation of the process" +
-                                        " ScaleDown, process not found");
-                            } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
-                                e.printStackTrace();
-                                throw new ApplicationManagerBeanException("Error during intantiation of the process" +
-                                        " ScaleDown, variable not found");
-                            } finally {
-                                logger.info("JPAAS-APPLICATION-MANAGER / ScaleDown finished.");
-                                logout();
-                            }
-                        }
-                    });
-                    return future;
-                } else {
-                    throw (new ApplicationManagerBeanException("process ScaleDown can't be " +
-                            "deploy on server..."));
+                    } catch (ProcessNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " ScaleDown, process not found");
+                    } catch (org.ow2.bonita.facade.exception.VariableNotFoundException e) {
+                        e.printStackTrace();
+                        throw new ApplicationManagerBeanException("Error during intantiation of the process" +
+                                " ScaleDown, variable not found");
+                    } finally {
+                        logger.info("JPAAS-APPLICATION-MANAGER / ScaleDown finished.");
+                        logout();
+                    }
                 }
+            });
+            return future;
+        } else {
+            throw (new ApplicationManagerBeanException("process ScaleDown can't be " +
+                    "deploy on server..."));
+        }
     }
 
     public ArrayList<Application> getListApplication() {
