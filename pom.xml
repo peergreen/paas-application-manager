@@ -87,6 +87,12 @@
     </dependency>
   </dependencies>
 
+  <scm>
+    <connection>scm:git:git://gitorious.ow2.org/ow2-jasmine/jpaas-application-manager.git</connection>
+    <developerConnection>scm:git:git@gitorious.ow2.org:ow2-jasmine/jpaas-application-manager.git</developerConnection>
+    <url>http://gitorious.ow2.org/ow2-jasmine/jpaas-application-manager/trees/master</url>
+  </scm>
+
   <build>
     <plugins>
       <plugin>
