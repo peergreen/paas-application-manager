@@ -86,8 +86,8 @@
   </dependencies>
 
       <scm>
-        <connection>scm:git:https://florent.benoit@forge.peergreen.com/git/git/jpaas/jpaas-application-manager.git</connection>
-        <developerConnection>scm:git:https://florent.benoit@forge.peergreen.com/git/git/jpaas/jpaas-application-manager.git</developerConnection>
+        <connection>scm:git:https://forge.peergreen.com/git/git/jpaas/jpaas-application-manager.git</connection>
+        <developerConnection>scm:git:https://forge.peergreen.com/git/git/jpaas/jpaas-application-manager.git</developerConnection>
         <url>https://forge.peergreen.com/git/summary/?r=jpaas/jpaas-application-manager.git</url>
         <tag>HEAD</tag>
     </scm>
