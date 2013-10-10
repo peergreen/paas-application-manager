@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>application-manager</artifactId>
+        <groupId>org.ow2.jonas.jpaas.jpaas-application-manager</groupId>
+        <version>1.0.0-M2-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>application-manager-mock</artifactId>
+    <name>jPaaS :: Application Manager :: Mock</name>
+    <description>jPaaS : Application Manager :: Mock</description>
+    <packaging>bundle</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.jpaas-manager-api</groupId>
+            <artifactId>jpaas-manager-api</artifactId>
+            <version>${manager-api.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.bundles</groupId>
+            <artifactId>ow2-util-log</artifactId>
+            <version>${ow2-bundles.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.ipojo.annotations</artifactId>
+            <version>${ipojo.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.ipojo</artifactId>
+            <version>${ipojo.version}</version>
+            <scope>provided</scope>
+        </dependency>
+         <dependency>
+            <groupId>org.ow2.jonas.jpaas.jpaas-application-manager</groupId>
+            <artifactId>application-manager-api</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>common</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-topology-datasource</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-topology-connector</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-node-template-jonas</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-node-template-jk</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-node-template-external-db</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>environment-template-core</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>cloud-application-deployable-artefact</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>cloud-application-deployable-xml</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>cloud-application-core</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.ow2.jonas.jpaas.util.cloud-desc</groupId>
+            <artifactId>deployment-core</artifactId>
+            <version>${jpaas-util.version}</version>
+        </dependency>
+
+
+
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>2.2.0</version>
+                <extensions>true</extensions>
+                <goals>
+                    <goal>bundle</goal>
+                </goals>
+                <configuration>
+                    <instructions>
+                        <_include>-target/classes/META-INF/${project.artifactId}.bnd</_include>
+                    </instructions>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-ipojo-plugin</artifactId>
+                <version>${ipojo.version}</version>
+                <configuration>
+                    <ignoreAnnotations>false</ignoreAnnotations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>ipojo-bundle</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
