@@ -1,0 +1,18 @@
+Bundle-Activator org.ow2.easybeans.osgi.ejbjar.Activator
+DynamicImport-Package *
+Export-Package org.ow2.jonas.jpaas.application.api
+Import-Package !com.thoughtworks.*,!org.jboss.*,!org.apache.tools.ant,!org.apache.tools.ant.*,!org.ow2.util.asm,*
+Private-Package org.ow2.jonas.jpaas.application.bean
+Include-Resource {maven-resources},src/process/CreateApplication/CreateApplication--1.0.bar, \
+                            src/process/CreateApplication/CreateApplicationVersion--1.0.bar, \
+                            src/process/CreateApplication/CreateApplicationVersionInstance--1.0.bar, \
+                            src/process/StartApplication/StartApplicationVersionInstance--1.0.bar, \
+                            src/process/StartApplication/DeployOnContainer--1.0.bar, \
+                            src/process/StartApplication/CreateLoadBalancer--1.0.bar, \
+                            src/process/ScaleUp/ScaleUp--1.0.bar, \
+                            src/process/ScaleUp/InstanciateConnector--1.0.bar, \
+                            src/process/ScaleUp/InstanciateConnectors--1.0.bar, \
+                            src/process/ScaleUp/InstanciateContainer--1.0.bar, \
+                            src/process/ScaleDown/ScaleDown--1.0.bar
+Embed-Dependency bonita-client
+Embed-Transitive false

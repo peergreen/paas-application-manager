@@ -1,30 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <parent>
-        <artifactId>application-manager</artifactId>
-        <groupId>org.ow2.jonas.jpaas.jpaas-application-manager</groupId>
-        <version>1.0.0-M2-SNAPSHOT</version>
-    </parent>
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <groupId>com.peergreen.paas</groupId>
+    <artifactId>paas-application-manager-parent</artifactId>
+    <version>1.0.0-M1-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>paas-application-manager-ejb</artifactId>
+  <name>PG PaaS :: Application Manager :: EJB</name>
+  <packaging>bundle</packaging>
 
-    <artifactId>application-manager-ejb</artifactId>
-    <name>jPaaS :: Application Manager :: Ejb</name>
-    <description>jPaaS : Application Manager :: Ejb</description>
-    <packaging>bundle</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.spec</groupId>
-            <artifactId>jboss-javaee-6.0</artifactId>
-            <version>1.0.0.Final</version>
-            <type>pom</type>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.ow2.jonas.jpaas.jpaas-manager-api</groupId>
-            <artifactId>jpaas-manager-api</artifactId>
+            <groupId>com.peergreen.paas</groupId>
+            <artifactId>paas-manager-api</artifactId>
             <version>${manager-api.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -41,13 +32,13 @@
         <dependency>
             <groupId>org.ow2.easybeans</groupId>
             <artifactId>easybeans-component-smartclient</artifactId>
-            <version>${easybeans-version}</version>
+            <version>${easybeans.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.ow2.easybeans.osgi</groupId>
             <artifactId>easybeans-osgi-annotations</artifactId>
-            <version>${easybeans-version}</version>
+            <version>${easybeans.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -57,73 +48,23 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.ow2.jonas.jpaas.system-representation</groupId>
-            <artifactId>system-representation-vo</artifactId>
+            <groupId>com.peergreen.paas</groupId>
+            <artifactId>paas-system-representation-vo</artifactId>
             <version>${sr.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.ow2.jonas.jpaas.system-representation</groupId>
-            <artifactId>system-representation-api</artifactId>
+            <groupId>com.peergreen.paas</groupId>
+            <artifactId>paas-system-representation-api</artifactId>
             <version>${sr.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.ow2.jonas.jpaas.jpaas-application-manager</groupId>
-            <artifactId>application-manager-api</artifactId>
+            <groupId>com.peergreen.paas</groupId>
+            <artifactId>paas-application-manager-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.2.0</version>
-                <extensions>true</extensions>
-                <goals>
-                    <goal>bundle</goal>
-                </goals>
-                <configuration>
-                    <instructions>
-                        <Bundle-Activator>org.ow2.easybeans.osgi.ejbjar.Activator</Bundle-Activator>
-                        <DynamicImport-Package>*</DynamicImport-Package>
-                        <Export-Package>org.ow2.jonas.jpaas.application.api</Export-Package>
-                        <Import-Package>
-                            !com.thoughtworks.*,!org.jboss.*,!org.apache.tools.ant,!org.apache.tools.ant.*,!org.ow2.util.asm,*
-                        </Import-Package>
-                        <Private-Package>org.ow2.jonas.jpaas.application.bean</Private-Package>
-                        <Include-Resource>
-                            {maven-resources},${project.basedir}/src/process/CreateApplication/CreateApplication--1.0.bar,
-                            ${project.basedir}/src/process/CreateApplication/CreateApplicationVersion--1.0.bar,
-                            ${project.basedir}/src/process/CreateApplication/CreateApplicationVersionInstance--1.0.bar,
-                            ${project.basedir}/src/process/StartApplication/StartApplicationVersionInstance--1.0.bar,
-                            ${project.basedir}/src/process/StartApplication/DeployOnContainer--1.0.bar,
-                            ${project.basedir}/src/process/StartApplication/CreateLoadBalancer--1.0.bar,
-                            ${project.basedir}/src/process/ScaleUp/ScaleUp--1.0.bar,
-                            ${project.basedir}/src/process/ScaleUp/InstanciateConnector--1.0.bar,
-                            ${project.basedir}/src/process/ScaleUp/InstanciateConnectors--1.0.bar,
-                            ${project.basedir}/src/process/ScaleUp/InstanciateContainer--1.0.bar,
-                            ${project.basedir}/src/process/ScaleDown/ScaleDown--1.0.bar
-                        </Include-Resource>
-                        <Embed-Dependency>bonita-client</Embed-Dependency>
-                        <Embed-Transitive>false</Embed-Transitive>
-                    </instructions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>
