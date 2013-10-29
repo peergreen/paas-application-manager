@@ -188,8 +188,8 @@ public class ApplicationManagerBean implements ApplicationManager {
         }
     }
 
-    public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException {
-        logger.info("JPAAS-APPLICATION-MANAGER / createApplicationVersion called : " + cloudApplicationVersionDescriptor);
+    public ApplicationVersion createApplicationVersion(String appId, String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException {
+        logger.info("appId=" + appId + ", Desc=" + cloudApplicationVersionDescriptor);
         final Map param = new HashMap();
         param.put("cloudApplicationVersionDescriptor", cloudApplicationVersionDescriptor);
         // deploy process if necessary
@@ -259,10 +259,10 @@ public class ApplicationManagerBean implements ApplicationManager {
         System.out.println("JPAAS-APPLICATION-MANAGER / notifyArtefactUploades called");
     }
 
-    public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException {
+    public ApplicationVersionInstance createApplicationVersionInstance(String appId, String versionId, String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException {
         //TODO
-        System.out.println("JPAAS-APPLICATION-MANAGER / createApplicationVersionInstance called : " +
-                cloudApplicationVersionInstanceDescriptor + "," + deploymentDescriptor);
+        System.out.println("appId=" + appId + ", versionId=" + versionId + "Desc=" +
+                cloudApplicationVersionInstanceDescriptor + ", DeployDesc=" + deploymentDescriptor);
         final Map param = new HashMap();
         param.put("cloudApplicationVersionInstanceDescriptor", cloudApplicationVersionInstanceDescriptor);
         param.put("deploymentDescriptor", deploymentDescriptor);
@@ -390,9 +390,24 @@ public class ApplicationManagerBean implements ApplicationManager {
         }
     }
 
-    public void stopApplicationVersionInstance() {
-        //TODO
-        System.out.println("JPAAS-APPLICATION-MANAGER / stopApplicationVersionInstance called");
+    public Future<ApplicationVersionInstance> stopApplicationVersionInstance(final String appId, final String versionId, final String instanceId) throws ApplicationManagerBeanException {
+        System.out.println("appId=" + appId + ", versionId=" + versionId + ", instanceId=" + instanceId);
+
+       ExecutorService es = Executors.newFixedThreadPool(3);
+        final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
+            public ApplicationVersionInstance call() throws Exception {
+                ApplicationVersionInstance appVersionInstance = new ApplicationVersionInstance() ;
+                appVersionInstance.setAppId(appId);
+                appVersionInstance.setVersionId(versionId);
+                appVersionInstance.setInstanceId(instanceId);
+                appVersionInstance.setState(ApplicationVersionInstance.INSTANCE_STOPPED);
+
+                return appVersionInstance;
+
+
+            }
+        });
+        return future;
     }
 
     public List<Application> findApplications() {
@@ -567,17 +582,17 @@ public class ApplicationManagerBean implements ApplicationManager {
     }
 
 
-    public void deleteApplication(String appId) {
+    public void deleteApplication(String appId) throws ApplicationManagerBeanException {
         //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / deleteApplication called");
     }
 
-    public void deleteApplicationVersion(String appId, String versionId) {
+    public void deleteApplicationVersion(String appId, String versionId) throws ApplicationManagerBeanException {
         //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / deleteApplicationVersion called");
     }
 
-    public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId) {
+    public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException {
         //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / deleteApplicationVersionInstance called");
     }

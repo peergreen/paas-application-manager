@@ -30,23 +30,28 @@ import java.util.concurrent.Future;
 public interface ApplicationManager {
 
   public Application createApplication(String cloudApplicationDescritor) throws ApplicationManagerBeanException;
-  public ApplicationVersion createApplicationVersion(String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException;
+  public ApplicationVersion createApplicationVersion(String appId, String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException;
   public void notifyArtefactUploades(String appId, String versionId, String artefactId);
-  public ApplicationVersionInstance createApplicationVersionInstance(String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException;
+  public ApplicationVersionInstance createApplicationVersionInstance(String appId, String versionId, String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException;
+
   public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
-  public void stopApplicationVersionInstance();
+  public Future<ApplicationVersionInstance> stopApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
+
   public List<Application> findApplications();
   public List<ApplicationVersion> findApplicationVersion(String appId);
   public List<ApplicationVersionInstance> findApplicationVersionsInstances(String appId, String versionId);
+
   public Application getApplication(String appId);
   public ApplicationVersion getApplicationVersion(String appId, String versionId);
   public ApplicationVersionInstance getApplicationVersionInstance(String appId, String versionId, String instanceId);
-  public void deleteApplication(String appId);
-  public void deleteApplicationVersion(String appId, String versionId);
-  public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId);
+
+  public void deleteApplication(String appId) throws ApplicationManagerBeanException;
+  public void deleteApplicationVersion(String appId, String versionId) throws ApplicationManagerBeanException;
+  public void deleteApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
+
   public Environment getEnvironment(String appId, String versionId, String instanceId);
-  public ArrayList<Application> getListApplication();
-    //Temporary to test ScaleUp
-    public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
-    public Future<ApplicationVersionInstance> scaleDown(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
+
+   //Temporary to test ScaleUp
+   public Future<ApplicationVersionInstance> scaleUp(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
+   public Future<ApplicationVersionInstance> scaleDown(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;
 }
