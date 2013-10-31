@@ -18,10 +18,7 @@
  */ 
 package org.ow2.jonas.jpaas.application.api;
 
-import org.ow2.jonas.jpaas.manager.api.Application;
-import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
-import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
-import org.ow2.jonas.jpaas.manager.api.Environment;
+import org.ow2.jonas.jpaas.manager.api.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ public interface ApplicationManager {
 
   public Application createApplication(String cloudApplicationDescritor) throws ApplicationManagerBeanException;
   public ApplicationVersion createApplicationVersion(String appId, String cloudApplicationVersionDescriptor) throws ApplicationManagerBeanException;
-  public void notifyArtefactUploades(String appId, String versionId, String artefactId);
+  public Deployable notifyArtefactUploades(String appId, String versionId, String deployableId);
   public ApplicationVersionInstance createApplicationVersionInstance(String appId, String versionId, String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException;
 
   public Future<ApplicationVersionInstance> startApplicationVersionInstance(String appId, String versionId, String instanceId) throws ApplicationManagerBeanException;

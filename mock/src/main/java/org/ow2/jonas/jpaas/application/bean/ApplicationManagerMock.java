@@ -25,17 +25,17 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Validate;
 import org.ow2.jonas.jpaas.application.api.ApplicationManager;
 import org.ow2.jonas.jpaas.application.api.ApplicationManagerBeanException;
-import org.ow2.jonas.jpaas.manager.api.Application;
-import org.ow2.jonas.jpaas.manager.api.ApplicationVersion;
-import org.ow2.jonas.jpaas.manager.api.ApplicationVersionInstance;
-import org.ow2.jonas.jpaas.manager.api.Environment;
+import org.ow2.jonas.jpaas.manager.api.*;
 
 import org.ow2.jonas.jpaas.util.clouddescriptors.cloudapplication.CloudApplicationDesc;
+import org.ow2.jonas.jpaas.util.clouddescriptors.cloudapplication.artefact.v1.generated.ArtefactDeployableType;
 import org.ow2.jonas.jpaas.util.clouddescriptors.cloudapplication.v1.generated.CloudApplicationType;
 
+import org.ow2.jonas.jpaas.util.clouddescriptors.cloudapplication.xml.v1.generated.XmlDeployableType;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -50,6 +50,8 @@ public class ApplicationManagerMock implements ApplicationManager {
     //WARNING !!!! This attribute was added only for dummy tests (it allows the developer to add or remove Applications like in database).
 //It has to be removed after the real implementation of all classes.
     private Map<String, Application> listApplication ;
+
+    public final static String UPLOAD_ROOT_DIR = "/tmp/paas-upload-dir";
 
     /**
      * The logger
@@ -153,6 +155,43 @@ public class ApplicationManagerMock implements ApplicationManager {
         appVersion.setVersionId(UUID.randomUUID().toString());
         appVersion.setVersionLabel(cloudApplication.getVersion());
 
+        //appVersion.setRequirements(cloudApplication.getRequirements().getRequirement());
+        //appVersion.setCapabilities(cloudApplication.getCapabilities().getApplication());
+
+        // deployables
+        List<Deployable> deployables = new ArrayList<Deployable>();
+        List<Object> deployablesType = cloudApplication.getDeployables().getDeployables();
+        for (Object deployableType:deployablesType) {
+            if (deployableType instanceof ArtefactDeployableType) {
+                ArtefactDeployableType artefactDeployable = (ArtefactDeployableType) deployableType;
+                Deployable deployable = new Deployable();
+                deployable.setDeployabledId(UUID.randomUUID().toString());
+                deployable.setDeployableName(artefactDeployable.getName());
+
+                deployable.setLocationUrl(buildLocationUrl(appId,appVersion.getVersionId(),deployable.getDeployableName()));
+
+                //deployable.setRequirements();
+                deployable.setUploaded(false);
+                //deployable.setSlaEnforcement();
+                deployables.add(deployable);
+            } else if (deployableType instanceof XmlDeployableType) {
+                XmlDeployableType xmlDeployable = (XmlDeployableType) deployableType;
+                Deployable deployable = new Deployable();
+                deployable.setDeployabledId(UUID.randomUUID().toString());
+                deployable.setDeployableName(xmlDeployable.getName());
+                deployable.setLocationUrl(buildLocationUrl(appId,appVersion.getVersionId(),deployable.getDeployableName()));
+                //deployable.setRequirements();
+                deployable.setUploaded(false);
+                //deployable.setSlaEnforcement();
+                deployables.add(deployable);
+            } else {
+                logger.error("Deployable type unknown:" + deployableType.getClass().toString());
+            }
+        }
+
+
+        appVersion.setSortedDeployablesList(deployables);
+
         versions.add(appVersion);
 
         app.setListApplicationVersion(versions);
@@ -163,9 +202,29 @@ public class ApplicationManagerMock implements ApplicationManager {
 
     }
 
-    public void notifyArtefactUploades(String appId, String versionId, String artefactId) {
-        //TODO
-        logger.info("appId=" + appId + ", versionId=" + versionId + ", artefactId=" + artefactId);
+    private String buildLocationUrl(String appId, String versionId, String deployableName) {
+        return UPLOAD_ROOT_DIR + File.separator +
+                "app" + File.separator +
+                appId + File.separator +
+                "version" + File.separator +
+                versionId + File.separator +
+                deployableName;
+    }
+
+    public Deployable notifyArtefactUploades(String appId, String versionId, String deployableId) {
+        logger.info("appId=" + appId + ", versionId=" + versionId + ", deployableId=" + deployableId);
+        Deployable deployable = null;
+        ApplicationVersion version = getApplicationVersion(appId,versionId);
+        for (Deployable d:version.getSortedDeployablesList()) {
+            if (d.getDeployabledId().equals(deployableId)) {
+                deployable = d;
+                deployable.setUploaded(true);
+                logger.info("Deployable " + deployableId + " updated");
+                break;
+            }
+        }
+        return deployable;
+
     }
 
     public ApplicationVersionInstance createApplicationVersionInstance(String appId, String versionId, String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException {
@@ -248,7 +307,7 @@ public class ApplicationManagerMock implements ApplicationManager {
         ExecutorService es = Executors.newFixedThreadPool(3);
         final Future<ApplicationVersionInstance> future = es.submit(new Callable<ApplicationVersionInstance>() {
             public ApplicationVersionInstance call() throws Exception {
-                ApplicationVersionInstance instance = getApplicationVersionInstance(appId,versionId,instanceId);
+                ApplicationVersionInstance instance = getApplicationVersionInstance(appId, versionId, instanceId);
                 if (instance == null) {
                     throw new ApplicationManagerBeanException("Application version instance '" + appId + "/" + versionId + "/" + instanceId + "' doesn't exist");
 
@@ -269,6 +328,7 @@ public class ApplicationManagerMock implements ApplicationManager {
     }
 
     public List<ApplicationVersion> findApplicationVersion(String appId) {
+
         logger.info("Get versions for app:" + appId);
 
         Application app = getApplication(appId);
@@ -320,7 +380,7 @@ public class ApplicationManagerMock implements ApplicationManager {
     public ApplicationVersionInstance getApplicationVersionInstance(String appId, String versionId, String instanceId) {
         logger.info("Get application instance with appId=" + appId + ", versionId=" + versionId + ", instanceId=" + instanceId);
 
-        ApplicationVersion version = getApplicationVersion(appId,versionId);
+        ApplicationVersion version = getApplicationVersion(appId, versionId);
         if (version == null) {
             return null;
         }
@@ -387,7 +447,7 @@ public class ApplicationManagerMock implements ApplicationManager {
             throw new ApplicationManagerBeanException("Application version instance '" + appId + "/" + versionId + "/" + instanceId + "' doesn't exist");
         }
 
-        List<ApplicationVersionInstance> instances = findApplicationVersionsInstances(appId,versionId);
+        List<ApplicationVersionInstance> instances = findApplicationVersionsInstances(appId, versionId);
         instances.remove(instance);
         version.setListApplicationVersionInstance(instances);
     }
@@ -439,6 +499,10 @@ public class ApplicationManagerMock implements ApplicationManager {
             List<ApplicationVersion> versions = findApplicationVersion(app.getAppId());
             for (ApplicationVersion version:versions)  {
                 logger.info("   Version - " + version.getVersionId() + "/" + version.getVersionLabel());
+                List <Deployable> deployables = version.getSortedDeployablesList();
+                for (Deployable deployable:deployables) {
+                    logger.info("    Deployable - " + deployable.getDeployabledId() + "/" + deployable.getDeployableName());
+                }
 
                 List<ApplicationVersionInstance> instances = findApplicationVersionsInstances(app.getAppId(),version.getVersionId());
                 for (ApplicationVersionInstance instance:instances) {

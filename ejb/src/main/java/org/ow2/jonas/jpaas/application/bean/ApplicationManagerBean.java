@@ -254,9 +254,10 @@ public class ApplicationManagerBean implements ApplicationManager {
         }
     }
 
-    public void notifyArtefactUploades(String appId, String versionId, String artefactId) {
+    public Deployable notifyArtefactUploades(String appId, String versionId, String artefactId) {
         //TODO
         System.out.println("JPAAS-APPLICATION-MANAGER / notifyArtefactUploades called");
+        return null;
     }
 
     public ApplicationVersionInstance createApplicationVersionInstance(String appId, String versionId, String cloudApplicationVersionInstanceDescriptor, String deploymentDescriptor) throws ApplicationManagerBeanException {
