@@ -293,6 +293,7 @@ public class ApplicationManagerMock implements ApplicationManager {
                 }
 
                 instance.setState(ApplicationVersionInstance.INSTANCE_RUNNING);
+                instance.setStateStr("RUNNING");
 
                 return instance;
             }
@@ -313,6 +314,8 @@ public class ApplicationManagerMock implements ApplicationManager {
 
                 }
                 instance.setState(ApplicationVersionInstance.INSTANCE_STOPPED);
+                instance.setStateStr("STOPPED");
+
 
                 return instance;
             }
